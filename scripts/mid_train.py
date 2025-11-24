@@ -174,6 +174,7 @@ def get_muon_momentum(it):
 # Training loop
 x, y = next(train_loader) # prefetch the very first batch of data
 min_val_bpb = float("inf")
+val_bpb = None # will be set if eval_every > 0
 smooth_train_loss = 0 # EMA of training loss
 ema_beta = 0.9 # EMA decay factor
 total_training_time = 0 # total wall-clock time of training
@@ -209,24 +210,27 @@ while True:
     if master_process and last_step and not dry_run:
         output_dirname = f"d{depth}" # e.g. d12
         checkpoint_dir = os.path.join(base_dir, "mid_checkpoints", output_dirname)
+        meta_dict = {
+            "step": step,
+            "model_config": {
+                "sequence_len": max_seq_len,
+                "vocab_size": tokenizer.get_vocab_size(),
+                "n_layer": depth,
+                "n_head": model.config.n_head,
+                "n_kv_head": model.config.n_kv_head,
+                "n_embd": model.config.n_embd,
+            },
+            "user_config": user_config, # inputs to the training script
+        }
+        # Only include val_bpb if it was calculated
+        if val_bpb is not None:
+            meta_dict["val_bpb"] = val_bpb
         save_checkpoint(
             checkpoint_dir,
             step,
             orig_model.state_dict(),
             [opt.state_dict() for opt in optimizers], # TODO: make sure saving across ranks is done correctly
-            {
-                "step": step,
-                "val_bpb": val_bpb, # loss at last step
-                "model_config": {
-                    "sequence_len": max_seq_len,
-                    "vocab_size": tokenizer.get_vocab_size(),
-                    "n_layer": depth,
-                    "n_head": model.config.n_head,
-                    "n_kv_head": model.config.n_kv_head,
-                    "n_embd": model.config.n_embd,
-                },
-                "user_config": user_config, # inputs to the training script
-            }
+            meta_dict
         )
 
     if last_step:
