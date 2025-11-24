@@ -32,6 +32,34 @@ python -m scripts.chat_web
 
 And then visit the URL shown. Make sure to access it correctly, e.g. on Lambda use the public IP of the node you're on, followed by the port, so for example [http://209.20.xxx.xxx:8000/](http://209.20.xxx.xxx:8000/), etc. Then talk to your LLM as you'd normally talk to ChatGPT! Get it to write stories or poems. Ask it to tell you who you are to see a hallucination. Ask it why the sky is blue. Or why it's green. The speedrun is a 4e19 FLOPs capability model so it's a bit like talking to a kindergartener :).
 
+### Balanced run (single GPU, 1-2 hours)
+
+If you only have access to a single GPU (like an A10 with 24GB) but want a model with basic reasoning capability, use the balanced script [speedrun_balanced.sh](speedrun_balanced.sh). This completes in ~1.5-2 hours and produces a decent model:
+
+```bash
+bash speedrun_balanced.sh
+```
+
+Or in a screen session:
+
+```bash
+screen -L -Logfile speedrun_balanced.log -S speedrun_balanced bash speedrun_balanced.sh
+```
+
+This balanced script provides a middle ground between the ultra-fast test and production runs:
+- **Single GPU**: Optimized for 1 GPU with 24GB memory (A10, RTX 4090, etc.)
+- **Moderate model**: depth=10 (~140M parameters) instead of depth=4 or depth=20
+- **Better tokenizer**: 500M chars instead of 100M (5x improvement over test)
+- **Sufficient training**: 2,500 base iterations, 250 mid iterations, 200 SFT iterations
+- **Full evaluations**: Quality monitoring enabled throughout training
+- **Training data**: 40 shards (~10B chars) instead of 4 or 240
+
+**Expected Results:**
+- Model produces coherent responses with basic reasoning capability
+- Good for testing, demos, and educational purposes
+- Not production-grade, but significantly more capable than the test run
+- Fits comfortably in 24GB GPU memory
+
 ### Ultra-fast test run
 
 If you want to verify the entire pipeline works end-to-end without waiting 4 hours, use the ultra-fast test script [speedrun_test.sh](speedrun_test.sh). This completes in ~20-30 minutes and produces a tiny but functional LLM:
