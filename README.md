@@ -32,6 +32,28 @@ python -m scripts.chat_web
 
 And then visit the URL shown. Make sure to access it correctly, e.g. on Lambda use the public IP of the node you're on, followed by the port, so for example [http://209.20.xxx.xxx:8000/](http://209.20.xxx.xxx:8000/), etc. Then talk to your LLM as you'd normally talk to ChatGPT! Get it to write stories or poems. Ask it to tell you who you are to see a hallucination. Ask it why the sky is blue. Or why it's green. The speedrun is a 4e19 FLOPs capability model so it's a bit like talking to a kindergartener :).
 
+### Ultra-fast test run
+
+If you want to verify the entire pipeline works end-to-end without waiting 4 hours, use the ultra-fast test script [speedrun_test.sh](speedrun_test.sh). This completes in ~20-30 minutes and produces a tiny but functional LLM:
+
+```bash
+bash speedrun_test.sh
+```
+
+Or in a screen session:
+
+```bash
+screen -L -Logfile speedrun_test.log -S speedrun_test bash speedrun_test.sh
+```
+
+This test script uses:
+- **Minimal data**: 4 shards (~400MB) instead of 240 shards (~24GB)
+- **Tiny model**: depth=4 (4-layer Transformer) instead of depth=20
+- **Minimal iterations**: 20 base training, 50 midtraining, 50 SFT iterations
+- **Reduced evaluations**: Skips CORE benchmarks and uses minimal validation
+
+The resulting model will be undertrained and make many mistakes, but it's perfect for testing that your environment is set up correctly and the entire pipeline runs successfully.
+
 ---
 
 <img width="2672" height="1520" alt="image" src="https://github.com/user-attachments/assets/ed39ddf8-2370-437a-bedc-0f39781e76b5" />
