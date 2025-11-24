@@ -71,7 +71,8 @@ python -m scripts.tok_eval
 # Base model (pretraining)
 
 # Number of processes/GPUs to use
-NPROC_PER_NODE=8
+# Set to 1 for single GPU, 8 for 8XH100, etc.
+NPROC_PER_NODE=1
 
 # Pretrain a minimal d4 model (depth=4) with very few iterations
 # This uses:
@@ -154,6 +155,7 @@ python -m nanochat.report generate
 echo "============================================"
 echo "Ultra-fast test run completed!"
 echo "This was a minimal test run with:"
+echo "  - 1 GPU (set NPROC_PER_NODE=8 for 8 GPUs)"
 echo "  - depth=4 (tiny model)"
 echo "  - 20 base training iterations"
 echo "  - 50 midtraining iterations"

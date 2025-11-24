@@ -47,6 +47,7 @@ screen -L -Logfile speedrun_test.log -S speedrun_test bash speedrun_test.sh
 ```
 
 This test script uses:
+- **Single GPU**: Configured for 1 GPU by default (change `NPROC_PER_NODE=1` to `8` if you have 8 GPUs)
 - **Minimal data**: 4 shards (~400MB) instead of 240 shards (~24GB)
 - **Tiny model**: depth=4 (4-layer Transformer) instead of depth=20
 - **Minimal iterations**: 20 base training, 50 midtraining, 50 SFT iterations
