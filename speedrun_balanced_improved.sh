@@ -104,14 +104,13 @@ NPROC_PER_NODE=8  # Change this to your GPU count (e.g., 1, 2, 4, 8)
 #   - num_heads = (640 + 127) // 128 = 6
 #   - Parameters: ~140M (vs 37M test / 561M production)
 #
-# IMPROVED Training configuration optimized for 8xA100:
+# IMPROVED Training configuration for 1xA10 (24GB):
 #   - max_seq_len=1024: Good context window
-#   - device_batch_size=8: Fits in A100 memory with gradient accumulation
-#   - total_batch_size=65536: Must be divisible by (device_batch_size * max_seq_len * num_gpus)
-#                             For 8 GPUs: 8 * 1024 * 8 = 65536, so 65536/65536 = 1 grad accum step
+#   - device_batch_size=8: Fits in 24GB with gradient accumulation
+#   - total_batch_size=24576: Reduced from 32768 for better stability
 #   - num_iterations=8000: INCREASED from 2500 (3.2x more training!)
-#   - Training tokens: ~524M (vs original 82M, 6.4x improvement!)
-#   - Tokens per parameter: 3.7x (vs original 0.59x, optimal 20x)
+#   - Training tokens: ~262M (vs original 82M)
+#   - Tokens per parameter: 1.9x (vs original 0.59x, optimal 20x)
 #
 # This configuration significantly reduces repetitive outputs by providing
 # the model with enough training signal to learn coherent patterns.
@@ -120,7 +119,7 @@ torchrun --standalone --nproc_per_node=$NPROC_PER_NODE -m scripts.base_train -- 
   --max_seq_len=1024 \
   --num_iterations=8000 \
   --device_batch_size=8 \
-  --total_batch_size=65536 \
+  --total_batch_size=24576 \
   --eval_every=400 \
   --eval_tokens=655360 \
   --core_metric_every=2000 \
