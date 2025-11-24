@@ -94,8 +94,9 @@ echo "Waiting for dataset download to complete..."
 wait $DATASET_DOWNLOAD_PID
 
 # Number of processes/GPUs to use
-# Set to 1 for single GPU training
-NPROC_PER_NODE=1
+# Set to the number of GPUs you have (1, 2, 4, 8, etc.)
+# IMPORTANT: Change this to match your hardware!
+NPROC_PER_NODE=4  # Change this to your GPU count (e.g., 1, 2, 4, 8)
 
 # Pretrain an improved d10 model (depth=10, ~140M parameters)
 # d10 model architecture:
