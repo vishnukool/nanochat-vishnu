@@ -10,6 +10,40 @@ This repo is a full-stack implementation of an LLM like ChatGPT in a single, cle
 
 To get a sense of the endpoint of this repo, you can currently find [nanochat d32](https://github.com/karpathy/nanochat/discussions/8) hosted on [nanochat.karpathy.ai](https://nanochat.karpathy.ai/). "d32" means that this model has 32 layers in the Transformer neural network. This model has 1.9 billion parameters, it was trained on 38 billion tokens by simply running the single script [run1000.sh](run1000.sh), and the total cost of training was ~$800 (about 33 hours training time on 8XH100 GPU node). While today this is enough to outperform GPT-2 of 2019, it falls dramatically short of modern Large Language Models like GPT-5. When talking to these micro models, you'll see that they make a lot of mistakes, they are a little bit naive and silly and they hallucinate a ton, a bit like children. It's kind of amusing. But what makes nanochat unique is that it is fully yours - fully configurable, tweakable, hackable, and trained by you from start to end. To train and talk to your own, we turn to...
 
+## Setup / Installation
+
+nanochat uses [uv](https://github.com/astral-sh/uv) for dependency management. Install dependencies:
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install all dependencies
+uv sync
+```
+
+That's it! `uv sync` will create a virtual environment, install all dependencies (including `tokenizers`, `torch`, `fastapi`, etc.), and build the custom Rust BPE tokenizer.
+
+### Chatting with a trained model
+
+If you've already trained a model, you can chat with it via CLI:
+
+```bash
+# Chat with the model (interactive mode)
+uv run python -m scripts.chat_cli -i sft --device-type cpu 
+
+# Or with a single prompt
+uv run python -m scripts.chat_cli -i sft -p "What is the capital of France?" --device-type cpu 
+```
+
+Options:
+- `-i, --source`: Model checkpoint to load (`sft`, `mid`, or `rl`)
+- `-p, --prompt`: Single prompt mode (non-interactive)
+- `-t, --temperature`: Sampling temperature (default: 0.6)
+- `-k, --top-k`: Top-k sampling parameter (default: 50)
+
+Note: You need to have trained a model first using one of the speedrun scripts below.
+
 ## Quick start
 
 The fastest way to feel the magic is to run the speedrun script [speedrun.sh](speedrun.sh), which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours. Boot up a new 8XH100 GPU box from your favorite provider (e.g. I use and like [Lambda](https://lambda.ai/service/gpu-cloud)), and kick off the training script:
